@@ -349,8 +349,8 @@ header{
     </div>
 
     <div class="products">
-        <div class="product" data-category="semi" data-name="★ Batman semi oversize" data-price="550" data-img="batman1.PNG">
-            <img src="batman1.PNG" alt="Playera Oversize">
+        <div class="product" data-category="semi" data-name="★ Batman semi oversize" data-price="550" data-img="batman1.png">
+            <img src="batman1.png" alt="Playera Oversize">
             <div class="info">
                 <h3>★ Batman semi oversize</h3>
                 <p class="price">$550</p>
@@ -521,8 +521,7 @@ document.querySelectorAll('.product').forEach(product => {
     
       // Click derecho o Ctrl+Click -> Agregar al carrito directamente
     product.addEventListener('click', (e) => {
-        if (e.button === 2 || (e.ctrlKey && e.button === 0)) {
-            e.preventDefault();
+        if (e.button === 2 || (e.ctrlKey && e.button === 0)) {            e.preventDefault();
             const productData = {
                 name: product.dataset.name, 
                 price: parseInt(product.dataset.price), 
