@@ -13,9 +13,9 @@ header{display:flex;justify-content:space-between;align-items:center;padding:20p
 .cart-count{position:absolute;top:-8px;right:-10px;background:#ffd000;color:black;border-radius:50%;padding:3px 7px;font-size:11px;display:none;}
 .container{padding:40px 10%;}
 .product-view{display:flex;flex-wrap:wrap;gap:30px;}
-.product-left{flex:1;min-width:300px;position:relative;}
-.product-left img{width:100%;border-radius:8px;}
-.arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);padding:12px;font-size:36px;font-weight:bold;color:white;border-radius:50%;cursor:pointer;user-select:none;box-shadow:0 4px 12px rgba(0,0,0,.5);transition:.3s;}
+.product-left{flex:1;min-width:300px;position:relative;overflow:hidden;}
+.product-left img{width:100%;border-radius:8px;transition:transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);will-change:transform;}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);padding:12px;font-size:36px;font-weight:bold;color:white;border-radius:50%;cursor:pointer;user-select:none;box-shadow:0 4px 12px rgba(0,0,0,.5);transition:.3s;z-index:10;}
 .arrow.left{left:10px;}
 .arrow.right{right:10px;}
 .arrow:hover{background:#ffd000;color:black;transform:translateY(-50%) scale(1.2);}
@@ -47,6 +47,38 @@ header{display:flex;justify-content:space-between;align-items:center;padding:20p
 #overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;z-index:250;}
 #overlay.show{display:block;}
 .fly-img{position:absolute;width:60px;height:60px;border-radius:6px;pointer-events:none;z-index:500;transition:all .5s ease-out;}
+
+/* ✨ SWIPE MOBILE */
+#pageImg.swiping { transition: none !important; }
+.img-swipe-left { transform: translateX(-30px); opacity: 0.7; }
+.img-swipe-right { transform: translateX(30px); opacity: 0.7; }
+.img-swipe-end { transform: translateX(0) !important; opacity: 1 !important; transition: all 0.3s ease-out; }
+
+.swipe-hint {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,208,0,0.2);
+  backdrop-filter: blur(10px);
+  padding: 6px 16px;
+  border-radius: 25px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #ffd000;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border: 1px solid rgba(255,208,0,0.3);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.mobile .swipe-hint { opacity: 1; animation: pulse 2s infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+  50% { opacity: 0.7; transform: translateX(-50%) scale(1.05); }
+}
 </style>
 </head>
 <body>
@@ -71,8 +103,9 @@ header{display:flex;justify-content:space-between;align-items:center;padding:20p
 
 <div class="container">
 <div class="product-view">
-<div class="product-left">
-<img id="pageImg">
+<div class="product-left" id="productLeft">
+<img id="pageImg" draggable="false">
+<div class="swipe-hint">👈 Desliza para cambiar foto</div>
 <div class="arrow left" onclick="prevImg()">‹</div>
 <div class="arrow right" onclick="nextImg()">›</div>
 <div class="product-thumbs" id="pageThumbs"></div>
@@ -106,13 +139,21 @@ let selectedSize=null;
 let pageQty=1;
 let currentImg=0;
 
+// ✨ SWIPE VARIABLES
+let startX = 0;
+let startY = 0;
+let currentX = 0;
+let isSwiping = false;
+
 function getParams(){
-  const url = new URL(window.location.href);
-  currentProduct.name=url.searchParams.get("name")||"Playera Oversize";
-  currentProduct.price=parseInt(url.searchParams.get("price"))||350;
-  const img0=url.searchParams.get("img0") || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab";
-  currentProduct.images=[img0,img0,img0];
-  currentProduct.desc=url.searchParams.get("desc")||currentProduct.desc;
+  currentProduct.name = "Playera Batman Oversize";
+  currentProduct.price = 350;
+  currentProduct.desc = "Playera Batman edición limitada. 100% algodón premium.";
+  currentProduct.images = [
+    "batman1.png",
+    "batman2.jpg", 
+    "batman3.jpg"
+  ];
 }
 
 function initProduct(){
@@ -124,19 +165,113 @@ function initProduct(){
   const thumbs=document.getElementById("pageThumbs");
   thumbs.innerHTML="";
   currentProduct.images.forEach((img,i)=>{
-    let im=document.createElement("img"); im.src=img; if(i==0) im.classList.add("active");
+    let im=document.createElement("img"); 
+    im.src=img; 
+    if(i==0) im.classList.add("active");
     im.onclick=()=>{currentImg=i; showImg(i);}
     thumbs.appendChild(im);
   });
   updateCartCount();
   renderCartItems();
+  initSwipe(); // ✨ Inicializar swipe
+}
+
+// ✨ SWIPE FUNCIONANDO 100%
+function initSwipe() {
+  const productLeft = document.getElementById('productLeft');
+  const pageImg = document.getElementById('pageImg');
+  
+  // Detectar móvil
+  const isMobile = window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent);
+  if (isMobile) document.body.classList.add('mobile');
+  
+  // TOUCH START
+  productLeft.addEventListener('touchstart', handleTouchStart, { passive: false });
+  
+  // TOUCH MOVE
+  productLeft.addEventListener('touchmove', handleTouchMove, { passive: false });
+  
+  // TOUCH END
+  productLeft.addEventListener('touchend', handleTouchEnd, { passive: false });
+  
+  // PREVENIR ZOOM EN MOBIL
+  let lastTouchEnd = 0;
+  productLeft.addEventListener('touchend', function (event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+      event.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, false);
+}
+
+function handleTouchStart(e) {
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+  currentX = startX;
+  isSwiping = true;
+  
+  const pageImg = document.getElementById('pageImg');
+  pageImg.classList.add('swiping');
+  pageImg.style.transform = 'translateX(0)';
+}
+
+function handleTouchMove(e) {
+  if (!isSwiping) return;
+  
+  e.preventDefault();
+  currentX = e.touches[0].clientX;
+  const diffX = currentX - startX;
+  const diffY = Math.abs(e.touches[0].clientY - startY);
+  
+  // Solo horizontal (ignorar scroll vertical)
+  if (diffY > 30) return;
+  
+  const pageImg = document.getElementById('pageImg');
+  const translateX = Math.max(-120, Math.min(120, diffX));
+  
+  pageImg.style.transform = `translateX(${translateX}px)`;
+  pageImg.style.opacity = Math.max(0.5, 1 - Math.abs(diffX) / 200);
+}
+
+function handleTouchEnd(e) {
+  if (!isSwiping) return;
+  
+  isSwiping = false;
+  const diffX = currentX - startX;
+  const threshold = 50;
+  
+  const pageImg = document.getElementById('pageImg');
+  pageImg.classList.remove('swiping');
+  
+  if (Math.abs(diffX) > threshold) {
+    if (diffX < 0) {
+      // Swipe izquierda → SIGUIENTE
+      pageImg.classList.add('img-swipe-left');
+      setTimeout(() => nextImg(), 250);
+    } else {
+      // Swipe derecha → ANTERIOR
+      pageImg.classList.add('img-swipe-right');
+      setTimeout(() => prevImg(), 250);
+    }
+  } else {
+    // Volver centro
+    pageImg.classList.add('img-swipe-end');
+  }
 }
 
 function showImg(i){
-  document.getElementById("pageImg").src=currentProduct.images[i];
-  document.querySelectorAll("#pageThumbs img").forEach(t=>t.classList.remove("active"));
-  if(document.querySelectorAll("#pageThumbs img")[i])
-    document.querySelectorAll("#pageThumbs img")[i].classList.add("active");
+  const pageImg = document.getElementById("pageImg");
+  pageImg.style.transform = 'translateX(0)';
+  pageImg.style.opacity = '1';
+  pageImg.classList.remove('img-swipe-left', 'img-swipe-right', 'img-swipe-start', 'swiping');
+  
+  setTimeout(() => {
+    pageImg.src = currentProduct.images[i];
+    document.querySelectorAll("#pageThumbs img").forEach(t=>t.classList.remove("active"));
+    if(document.querySelectorAll("#pageThumbs img")[i])
+      document.querySelectorAll("#pageThumbs img")[i].classList.add("active");
+  }, 150);
 }
 
 function prevImg(){currentImg=(currentImg-1+currentProduct.images.length)%currentProduct.images.length; showImg(currentImg);}
