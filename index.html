@@ -128,14 +128,14 @@ header{
 }
 .search-bar .clear-btn {
     position: absolute;
-    right: 9%;        /* un poco dentro del input */
+    right: 9%;
     top: 50%;          
     transform: translateY(-50%);
     cursor: pointer;
     font-weight: bold;
     color: #ffd000;
     display: none;
-    z-index: 2;         /* asegurar que quede sobre el input */
+    z-index: 2;
 }
 /* --- RESULTADOS --- */
 .search-results{
@@ -396,7 +396,7 @@ function renderCartItems(){
         let div=document.createElement("div"); 
         div.className="cart-item";
         div.innerHTML=`
-        <img src="${p.img}">
+        <img src="${p.img || p.images?.[0]}">
         <div class="cart-item-info"><span>${p.name}</span><span class="cart-price">$${p.price}</span></div>
         <div class="cart-item-controls">
             <button onclick="changeQty(${i},-1)">-</button>
@@ -434,6 +434,16 @@ function flyToCart(img){
         flyImg.style.opacity="0.5";
     });
     setTimeout(()=>{document.body.removeChild(flyImg);},500);
+}
+
+// *** NUEVA FUNCIÓN: Ir a página del producto ***
+function goToProduct(productElement) {
+    const name = productElement.dataset.name;
+    const price = productElement.dataset.price;
+    const img = productElement.dataset.img;
+    
+    const url = `producto.html?name=${encodeURIComponent(name)}&price=${price}&img0=${encodeURIComponent(img)}`;
+    window.location.href = url;
 }
 
 // Agregar al carrito
@@ -477,11 +487,10 @@ searchInput.addEventListener('input', function(){
         const name=p.querySelector('h3').innerText.toLowerCase();
         if(name.includes(query)){
             const imgSrc=p.querySelector('img').src;
-            const link=p.dataset.link||'#';
             const div=document.createElement('div');
             div.className='result';
             div.innerHTML=`<img src="${imgSrc}"><span>${p.querySelector('h3').innerText}</span>`;
-            div.addEventListener('click', ()=>{window.location.href=link;});
+            div.addEventListener('click', ()=>{goToProduct(p);});
             searchResults.appendChild(div);
             count++;
         }
@@ -494,12 +503,39 @@ clearBtn.addEventListener('click', ()=>{
     clearBtn.style.display='none';
 });
 
-// Click en productos para agregar al carrito
-document.querySelectorAll('.product').forEach(p=>{
-    p.addEventListener('click', ()=>{
-        const product={name:p.dataset.name, price:parseInt(p.dataset.price), img:p.dataset.img};
-        const img=p.querySelector('img');
-        addToCart(product,img);
+// *** EVENTOS CORREGIDOS PARA PRODUCTOS ***
+document.querySelectorAll('.product').forEach(product => {
+    // Click en imagen o nombre -> Ir a página del producto
+    const img = product.querySelector('img');
+    const info = product.querySelector('.info');
+    
+    img.addEventListener('click', (e) => {
+        e.stopPropagation();
+        goToProduct(product);
+    });
+    
+    info.addEventListener('click', (e) => {
+        e.stopPropagation();
+        goToProduct(product);
+    });
+    
+      // Click derecho o Ctrl+Click -> Agregar al carrito directamente
+    product.addEventListener('click', (e) => {
+        if (e.button === 2 || (e.ctrlKey && e.button === 0)) {
+            e.preventDefault();
+            const productData = {
+                name: product.dataset.name, 
+                price: parseInt(product.dataset.price), 
+                img: product.dataset.img
+            };
+            const imgElement = product.querySelector('img');
+            addToCart(productData, imgElement);
+        }
+    });
+    
+    // Prevenir menú contextual en productos
+    product.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
     });
 });
 
