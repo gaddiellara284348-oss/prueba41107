@@ -683,6 +683,16 @@ window.scrollTo({
     left: 0,
     behavior: 'instant'
 });
+
+// ➤ SOLO ANTI-DOBLE TAP (permite pellizco)
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function(event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) { // Doble tap detectado
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
 </script>
 
 </body>
