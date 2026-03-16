@@ -1,494 +1,429 @@
+<!-- CÓDIGO HTML COMPLETO CON SWIPE -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Producto | INNEGABLE</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Producto | INNEGABLE</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700;900&family=Pirata+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700;900&family=Pirata+One&display=swap" rel="stylesheet">
 
-    <style>
-        /* --- ESTILOS BASE Y SCROLLBAR PERSONALIZADA --- */
-        :root {
-            --patron-innegable: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='35' viewBox='0 0 70 35'%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' font-family='Pirata One, serif' font-size='10' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='0.4'%3EINNEGABLE%3C/text%3E%3C/svg%3E");
-        }
+<style>
+/* --- ESTILOS BASE --- */
+:root {
+    --patron-innegable: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='35' viewBox='0 0 70 35'%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' font-family='Pirata One, serif' font-size='10' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='0.4'%3EINNEGABLE%3C/text%3E%3C/svg%3E");
+}
 
-        body {
-            margin: 0;
-            font-family: 'Montserrat', sans-serif;
-            background: #0a0a0a;
-            color: white;
-            overflow: hidden; /* Evitamos el scroll de la página completa */
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: #0a0a0a;
+    color: white;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 40px;
-            border-bottom: 1px solid #222;
-            background: #0a0a0a;
-            z-index: 100;
-            flex-shrink: 0;
-        }
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    border-bottom: 1px solid #222;
+    background: #0a0a0a;
+    z-index: 100;
+    flex-shrink: 0;
+}
 
-        .back-btn { cursor: pointer; font-size: 30px; transition: 0.2s; position: relative; top: -3px; }
-        .back-btn:hover { color: #ffd000; }
-        .logo { font-weight: 900; letter-spacing: 5px; font-size: 18px; }
-        .cart { cursor: pointer; position: relative; padding: 5px; }
-        .cart-count {
-            position: absolute; top: -5px; right: -5px;
-            background: #ffd000; color: black;
-            border-radius: 50%; padding: 2px 5px;
-            font-size: 9px; font-weight: bold; display: none;
-        }
+.back-btn { cursor: pointer; font-size: 30px; transition: 0.2s; position: relative; top: -3px; }
+.back-btn:hover { color: #ffd000; }
+.logo { font-weight: 900; letter-spacing: 5px; font-size: 18px; }
+.cart { cursor: pointer; position: relative; padding: 5px; }
+.cart-count {
+    position: absolute; top: -5px; right: -5px;
+    background: #ffd000; color: black;
+    border-radius: 50%; padding: 2px 5px;
+    font-size: 9px; font-weight: bold; display: none;
+}
 
-        /* --- NUEVO CONTENEDOR SPLIT (DOS COLUMNAS) --- */
-        .container {
-            display: flex;
-            flex: 1; /* Ocupa el resto de la altura */
-            overflow: hidden;
-        }
+/* --- CONTENEDOR PRINCIPAL --- */
+.container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
 
-        /* --- SECCIÓN IZQUIERDA: IMAGEN CON FONDO FUSIONADO --- */
-        .product-left {
-            flex: 0 0 60%; /* Ocupa el 60% del ancho */
-            position: relative;
-            background: #000; 
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-right: 1px solid #1a1a1a;
-        }
+/* --- IZQUIERDA: IMAGEN --- */
+.product-left {
+    flex: 0 0 60%;
+    position: relative;
+    background: #000; 
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #1a1a1a;
+    touch-action: pan-y; /* Permite swipe horizontal */
+}
 
-        /* Patrón de fondo que cubre todo y se fusiona */
-        .product-left::before {
-            content: "";
-            position: absolute;
-            inset: -50%;
-            background-image: var(--patron-innegable);
-            background-repeat: repeat;
-            transform: rotate(-25deg);
-            z-index: 1;
-            pointer-events: none;
-            opacity: 0.8;
-        }
+.product-left::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background-image: var(--patron-innegable);
+    background-repeat: repeat;
+    transform: rotate(-25deg);
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.8;
+}
 
-        /* Sombra radial para dar profundidad a la foto */
-        .product-left::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 100%);
-            z-index: 2;
-            pointer-events: none;
-        }
+.product-left::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 100%);
+    z-index: 2;
+    pointer-events: none;
+}
 
-        .product-left img {
-            max-width: 80%;
-            max-height: 80%;
-            object-fit: contain;
-            border-radius: 15px; /* Foto redondeada */
-            z-index: 3;
-            position: relative;
-            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.9));
-            transition: opacity 0.3s ease;
-        }
+.product-left img {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+    border-radius: 15px;
+    z-index: 3;
+    position: relative;
+    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.9));
+    transition: opacity 0.3s ease;
+}
 
-        /* Flechas de galería */
-        .arrow {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            background: rgba(0,0,0,.6); width: 45px; height: 45px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 32px; color: white; border-radius: 50%;
-            cursor: pointer; z-index: 10; transition: 0.3s;
-            border: 1px solid #222;
-        }
-        .arrow:hover { background: #ffd000; color: black; border-color: #ffd000; }
-        .arrow.left { left: 20px; }
-        .arrow.right { right: 30px; } /* Ajustado para que no se vea cortada */
+/* Flechas de galería */
+.arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(0,0,0,.6); width: 45px; height: 45px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; color: white; border-radius: 50%;
+    cursor: pointer; z-index: 10; transition: 0.3s;
+    border: 1px solid #222;
+}
+.arrow:hover { background: #ffd000; color: black; border-color: #ffd000; }
+.arrow.left { left: 20px; }
+.arrow.right { right: 30px; }
 
-        /* Puntitos (Dots) */
-        .product-dots {
-            position: absolute; bottom: 30px; left: 50%;
-            transform: translateX(-50%); display: flex;
-            gap: 10px; z-index: 10;
-        }
-        .product-dot {
-            width: 12px; height: 12px; background: rgba(255,255,255,0.2);
-            border-radius: 50%; cursor: pointer; transition: 0.3s;
-        }
-        .product-dot.active {
-            background: #ffd000; transform: scale(1.3); box-shadow: 0 0 8px #ffd000;
-        }
+/* Dots */
+.product-dots {
+    position: absolute; bottom: 30px; left: 50%;
+    transform: translateX(-50%); display: flex;
+    gap: 10px; z-index: 10;
+}
+.product-dot {
+    width: 12px; height: 12px; background: rgba(255,255,255,0.2);
+    border-radius: 50%; cursor: pointer; transition: 0.3s;
+}
+.product-dot.active {
+    background: #ffd000; transform: scale(1.3); box-shadow: 0 0 8px #ffd000;
+}
 
-        /* --- SECCIÓN DERECHA: INFO CON SCROLL PERSONALIZADO --- */
-        .product-right {
-            flex: 1; /* Ocupa el 40% restante */
-            background: #0d0d0d; /* Un negro ligeramente diferente para definir zona */
-            overflow-y: scroll; /* Permitimos scroll vertical */
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            position: relative;
-        }
+/* --- DERECHA: INFO --- */
+.product-right {
+    flex: 1;
+    background: #0d0d0d;
+    overflow-y: scroll;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    position: relative;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #ffd000 #0a0a0a;
+}
+.product-right::-webkit-scrollbar { width: 8px; }
+.product-right::-webkit-scrollbar-track { background: #0a0a0a; }
+.product-right::-webkit-scrollbar-thumb { background-color: #ffd000; border-radius: 4px; border: 2px solid #0a0a0a; }
 
-        /* --- DEFINICIÓN DE LA BARRA DE SCROLL CON PATRÓN GÓTICO --- */
-        .product-right::-webkit-scrollbar {
-            width: 35px; /* Ancho cómodo para mostrar el patrón */
-        }
+/* Contenido info */
+#pageTitle { margin: 0; font-size: 32px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+#pagePrice { font-size: 28px; color: #ffd000; font-weight: 700; margin: 0; }
+.description { color: #888; font-size: 15px; line-height: 1.7; margin-bottom: 20px; }
 
-        /* La pista (track) por donde corre la barra */
-        .product-right::-webkit-scrollbar-track {
-            background: #0a0a0a;
-            border-left: 1px solid #1a1a1a;
-        }
+.size-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.size-header h4 { margin: 0; font-size: 13px; text-transform: uppercase; color: #555; }
+.size-chart-link { font-size: 12px; color: #ffd000; text-decoration: none; }
 
-        /* El tirador (thumb) con el patrón gótico */
-        .product-right::-webkit-scrollbar-thumb {
-            background-color: #ffd000; /* Fondo amarillo base */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='35' viewBox='0 0 70 35'%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' font-family='Pirata One, serif' font-size='10' fill='black' fill-opacity='0.6'%3EINNEGABLE%3C/text%3E%3C/svg%3E");
-            background-repeat: repeat;
-            border-radius: 0; /* Sin bordes redondeados para el patrón continuo */
-            border-left: 1px solid #000;
-        }
+.size-options { display: flex; gap: 12px; }
+.size-options button {
+    width: 50px; height: 50px;
+    background: #0a0a0a; border: 1px solid #333;
+    color: white; cursor: pointer; border-radius: 8px;
+    font-family: inherit; font-weight: bold; font-size: 16px;
+    transition: all 0.3s ease;
+}
+.size-options button:hover:not(.active) { border-color: #ffd000; color: #ffd000; }
+.size-options button.active {
+    background: #ffd000; color: black; border-color: #ffd000;
+    box-shadow: 0 0 15px rgba(255,208,0,0.3);
+}
 
-        /* Estilo para Firefox */
-        .product-right {
-            scrollbar-width: thin;
-            scrollbar-color: #ffd000 #0a0a0a;
-        }
+.qty-selector { display: flex; gap: 0; align-items: center; border: 1px solid #333; border-radius: 8px; overflow: hidden; width: fit-content; margin-top: 10px; }
+.qty-selector button { width: 40px; height: 40px; background: #0a0a0a; color: #555; border: none; cursor: pointer; font-size: 20px; transition: color 0.3s; }
+.qty-selector button:hover { color: white; }
+.qty-selector input { width: 50px; height: 40px; text-align: center; background: transparent; border: none; border-left: 1px solid #333; border-right: 1px solid #333; color: white; font-size: 16px; font-weight: bold; }
 
-        /* Elementos de info */
-        #pageTitle { margin: 0; font-size: 32px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-        #pagePrice { font-size: 28px; color: #ffd000; font-weight: 700; margin: 0; }
-        .description { color: #888; font-size: 15px; line-height: 1.7; margin-bottom: 20px; }
+.add-cart {
+    background: white; color: black; padding: 22px;
+    border-radius: 12px; cursor: pointer; font-weight: 900;
+    border: none; font-size: 17px; text-transform: uppercase;
+    letter-spacing: 2px; transition: all 0.3s ease; margin-top: 30px;
+}
+.add-cart:hover { background: #ffd000; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255,208,0,0.3); }
 
-        .size-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .size-header h4 { margin: 0; font-size: 13px; text-transform: uppercase; color: #555; }
-        .size-chart-link { font-size: 12px; color: #ffd000; text-decoration: none; }
+/* CARRITO PANEL Y TOAST */
+#cartPanel { position: fixed; right: -100%; top: 0; width: 380px; max-width: 90%; height: 100%; background: #080808; border-left: 1px solid #1a1a1a; padding: 30px; transition: .4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 300; overflow-y: auto; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+#cartPanel.open { right: 0; }
+.cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #1a1a1a; padding-bottom: 15px; }
+.close-cart { cursor: pointer; font-size: 28px; transition: color 0.3s; }
+.close-cart:hover { color: #ffd000; }
+.cart-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; background: #111; padding: 12px; border-radius: 8px; border: 1px solid #1a1a1a; }
+.cart-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
 
-        .size-options { display: flex; gap: 12px; }
-        .size-options button {
-            width: 50px; height: 50px;
-            background: #0a0a0a; border: 1px solid #333;
-            color: white; cursor: pointer; border-radius: 8px;
-            font-family: inherit; font-weight: bold; font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        .size-options button:hover:not(.active) { border-color: #ffd000; color: #ffd000; }
-        .size-options button.active {
-            background: #ffd000; color: black; border-color: #ffd000;
-            box-shadow: 0 0 15px rgba(255,208,0,0.3);
-        }
+#toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #ffd000; color: black; padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 14px; transition: all 0.4s ease; opacity: 0; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: none; }
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        .qty-selector {
-            display: flex; gap: 0; align-items: center;
-            border: 1px solid #333; border-radius: 8px; overflow: hidden;
-            width: fit-content; margin-top: 10px;
-        }
-        .qty-selector button {
-            width: 40px; height: 40px; background: #0a0a0a;
-            color: #555; border: none; cursor: pointer;
-            font-size: 20px; transition: color 0.3s;
-        }
-        .qty-selector button:hover { color: white; }
-        .qty-selector input {
-            width: 50px; height: 40px; text-align: center;
-            background: transparent; border: none;
-            border-left: 1px solid #333; border-right: 1px solid #333;
-            color: white; font-size: 16px; font-weight: bold;
-        }
+#overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; opacity: 0; pointer-events: none; transition: 0.3s; }
+#overlay.show { opacity: 1; pointer-events: all; }
 
-        .add-cart {
-            background: white; color: black; padding: 22px;
-            border-radius: 12px; cursor: pointer; font-weight: 900;
-            border: none; font-size: 17px; text-transform: uppercase;
-            letter-spacing: 2px; transition: all 0.3s ease; margin-top: 30px;
-        }
-        .add-cart:hover { background: #ffd000; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255,208,0,0.3); }
-
-        /* CARRITO PANEL Y TOAST */
-        #cartPanel {
-            position: fixed; right: -100%; top: 0;
-            width: 380px; max-width: 90%; height: 100%;
-            background: #080808; border-left: 1px solid #1a1a1a;
-            padding: 30px; transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 300; overflow-y: auto; box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-        }
-        #cartPanel.open { right: 0; }
-        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #1a1a1a; padding-bottom: 15px; }
-        .close-cart { cursor: pointer; font-size: 28px; transition: color 0.3s; }
-        .close-cart:hover { color: #ffd000; }
-        .cart-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; background: #111; padding: 12px; border-radius: 8px; border: 1px solid #1a1a1a; }
-        .cart-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
-
-        #toast {
-            position: fixed; bottom: 30px; left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #ffd000; color: black; padding: 15px 30px;
-            border-radius: 50px; font-weight: bold; font-size: 14px;
-            transition: all 0.4s ease; opacity: 0; z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: none;
-        }
-        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* OVERLAY */
-        #overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 200; opacity: 0;
-            pointer-events: none; transition: 0.3s;
-        }
-        #overlay.show { opacity: 1; pointer-events: all; }
-
-        /* --- RESPONSIVE CELULAR (REHACER A COLUMNAS VERTICALES) --- */
-        @media (max-width: 900px) {
-            body { overflow: auto; height: auto; }
-            .container { flex-direction: column; }
-            .product-left { flex: none; width: 100%; height: 80vh; border-right: none; border-bottom: 1px solid #1a1a1a; }
-            .product-left img { max-width: 90%; max-height: 90%; }
-            .product-right { overflow: visible; width: 100%; box-sizing: border-box; padding: 30px; }
-            .product-right::-webkit-scrollbar { display: none; } /* Ocultar scrollbar personalizada en móvil */
-            #pageTitle { font-size: 26px; }
-            .arrow { width: 40px; height: 40px; font-size: 28px; }
-            .arrow.left { left: 10px; }
-            .arrow.right { right: 10px; }
-        }
-    </style>
+/* --- RESPONSIVE CELULAR --- */
+@media (max-width: 900px) {
+    body { overflow: auto; height: auto; }
+    .container { flex-direction: column; }
+    .product-left { flex: none; width: 100%; height: 80vh; border-right: none; border-bottom: 1px solid #1a1a1a; }
+    .product-left img { max-width: 90%; max-height: 90%; }
+    .product-right { overflow: visible; width: 100%; box-sizing: border-box; padding: 30px; }
+    .product-right::-webkit-scrollbar { display: none; }
+    #pageTitle { font-size: 26px; }
+    .arrow { width: 40px; height: 40px; font-size: 28px; }
+    .arrow.left { left: 10px; }
+    .arrow.right { right: 10px; }
+}
+</style>
 </head>
-
 <body>
+<header>
+    <div class="back-btn" onclick="goHome()">←</div>
+    <div class="logo">INNEGABLE</div>
+    <div class="cart" onclick="toggleCart()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.6 13.4a2 2 0 0 0 2 1.6h7.4a2 2 0 0 0 2-1.6L23 6H6"></path></svg>
+        <span id="cart-count" class="cart-count">0</span>
+    </div>
+</header>
 
-    <header>
-        <div class="back-btn" onclick="goHome()">←</div>
-        <div class="logo">INNEGABLE</div>
-        <div class="cart" onclick="toggleCart()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.6 13.4a2 2 0 0 0 2 1.6h7.4a2 2 0 0 0 2-1.6L23 6H6"></path></svg>
-            <span id="cart-count" class="cart-count">0</span>
-        </div>
-    </header>
+<div id="overlay" onclick="closeCart()"></div>
 
-    <div id="overlay" onclick="closeCart()"></div>
-
-    <div class="container">
-        
-        <div class="product-left" id="productLeft">
-            <div class="arrow left" onclick="prevImg()">‹</div>
-            <img id="pageImg" src="batman1.png" alt="Cargando producto...">
-            <div class="arrow right" onclick="nextImg()">›</div>
-            <div class="product-dots" id="pageDots"></div>
-        </div>
-
-        <div class="product-right">
-            <h1 id="pageTitle">...</h1>
-            <p id="pagePrice">$0</p>
-            
-            <p class="description" id="pageDesc">Corte oversize con caída premium, confeccionada en algodón 240g de alta densidad. Un básico innegable para tu colección diaria.</p>
-
-            <div style="margin-top: 10px;">
-                <div class="size-header">
-                    <h4>Talla</h4>
-                    <a href="#" class="size-chart-link">Guía de tallas</a>
-                </div>
-                <div class="size-options">
-                    <button onclick="selectSize(this)">S</button>
-                    <button onclick="selectSize(this)">M</button>
-                    <button onclick="selectSize(this)">L</button>
-                    <button onclick="selectSize(this)">XL</button>
-                </div>
-            </div>
-
-            <div style="margin-top: 10px;">
-                <h4 style="margin-bottom:12px; font-size: 13px; text-transform: uppercase; color: #555;">Cantidad</h4>
-                <div class="qty-selector">
-                    <button onclick="decreaseQty()">−</button>
-                    <input type="number" id="pageQty" value="1" readonly>
-                    <button onclick="increaseQty()">+</button>
-                </div>
-            </div>
-
-            <button class="add-cart" onclick="addProduct()">Agregar al carrito</button>
-
-            <div style="margin-top: 40px; border-top: 1px solid #1a1a1a; padding-top: 25px; color: #555; font-size: 14px; line-height: 1.6;">
-                <p>✓ Envío gratis en órdenes mayores a $1500 MXN</p>
-                <p style="margin-top: 8px;">✓ Pagos seguros vía Stripe o PayPal</p>
-                <p style="margin-top: 8px;">✓ Cambios y devoluciones sin costo</p>
-                <p style="margin-top: 25px; color: #333;">Composición: 100% Algodón Premium. Hecho en México.</p>
-            </div>
-            <div style="height: 100px;"></div> </div>
+<div class="container">
+    <div class="product-left" id="productLeft">
+        <div class="arrow left" onclick="prevImg()">‹</div>
+        <img id="pageImg" src="batman1.png" alt="Cargando producto...">
+        <div class="arrow right" onclick="nextImg()">›</div>
+        <div class="product-dots" id="pageDots"></div>
     </div>
 
-    <div id="toast">Producto agregado ✓</div>
+    <div class="product-right">
+        <h1 id="pageTitle">...</h1>
+        <p id="pagePrice">$0</p>
+        <p class="description" id="pageDesc">Corte oversize con caída premium...</p>
 
-    <div id="cartPanel">
-        <div class="cart-header">
-            <h2 style="margin:0; letter-spacing: 2px; font-weight: 900;">CARRITO</h2>
-            <div class="close-cart" onclick="closeCart()">✕</div>
-        </div>
-        <div id="cartItems"></div>
-                <div style="position: absolute; bottom: 30px; left: 30px; right: 30px;">
-            <div style="display:flex; justify-content: space-between; border-top: 1px solid #1a1a1a; padding-top: 20px; margin-bottom: 20px;">
-                <span style="color:#aaa;">Subtotal:</span>
-                <span id="total" style="font-weight:900; color:#ffd000; font-size: 22px;">$0</span>
+        <div style="margin-top: 10px;">
+            <div class="size-header">
+                <h4>Talla</h4>
+                <a href="#" class="size-chart-link">Guía de tallas</a>
             </div>
-            <button style="width:100%; background:#fff; color:black; border:none; padding:18px; font-weight:900; border-radius:12px; cursor:pointer; font-size:16px; text-transform:uppercase; letter-spacing:1px;" onclick="alert('Checkout')">Finalizar Compra</button>
+            <div class="size-options">
+                <button onclick="selectSize(this)">S</button>
+                <button onclick="selectSize(this)">M</button>
+                <button onclick="selectSize(this)">L</button>
+                <button onclick="selectSize(this)">XL</button>
+            </div>
         </div>
+
+        <div style="margin-top: 10px;">
+            <h4 style="margin-bottom:12px; font-size: 13px; text-transform: uppercase; color: #555;">Cantidad</h4>
+            <div class="qty-selector">
+                <button onclick="decreaseQty()">−</button>
+                <input type="number" id="pageQty" value="1" readonly>
+                <button onclick="increaseQty()">+</button>
+            </div>
+        </div>
+
+        <button class="add-cart" onclick="addProduct()">Agregar al carrito</button>
+
+        <div style="margin-top: 40px; border-top: 1px solid #1a1a1a; padding-top: 25px; color: #555; font-size: 14px; line-height: 1.6;">
+            <p>✓ Envío gratis en órdenes mayores a $1500 MXN</p>
+            <p style="margin-top: 8px;">✓ Pagos seguros vía Stripe o PayPal</p>
+            <p style="margin-top: 8px;">✓ Cambios y devoluciones sin costo</p>
+            <p style="margin-top: 25px; color: #333;">Composición: 100% Algodón Premium. Hecho en México.</p>
+        </div>
+        <div style="height: 100px;"></div>
     </div>
+</div>
 
-    <script>
-        let cart = JSON.parse(localStorage.getItem("cart")) || [];
-        const params = new URLSearchParams(window.location.search);
+<div id="toast">Producto agregado ✓</div>
 
-        // ✅ Galerías con tus 3 fotos
-        let galerias = {
-            "★ Batman semi oversize": ["batman1.png", "batman2.jpg", "batman3.jpg"],
-            "Playera Innegable": ["batman1.png", "batman2.jpg", "batman3.jpg"]
-        };
+<div id="cartPanel">
+    <div class="cart-header">
+        <h2 style="margin:0; letter-spacing: 2px; font-weight: 900;">CARRITO</h2>
+        <div class="close-cart" onclick="closeCart()">✕</div>
+    </div>
+    <div id="cartItems"></div>
+    <div style="position: absolute; bottom: 30px; left: 30px; right: 30px;">
+        <div style="display:flex; justify-content: space-between; border-top: 1px solid #1a1a1a; padding-top: 20px; margin-bottom: 20px;">
+            <span style="color:#aaa;">Subtotal:</span>
+            <span id="total" style="font-weight:900; color:#ffd000; font-size: 22px;">$0</span>
+        </div>
+        <button style="width:100%; background:#fff; color:black; border:none; padding:18px; font-weight:900; border-radius:12px; cursor:pointer; font-size:16px; text-transform:uppercase; letter-spacing:1px;" onclick="alert('Checkout')">Finalizar Compra</button>
+    </div>
+</div>
 
-        let nombreUrl = params.get('name') || "★ Batman semi oversize";
-        let imagenUrl = params.get('img0') || "batman1.png";
+<script>
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let galerias = {
+    "★ Batman semi oversize": ["batman1.png", "batman2.jpg", "batman3.jpg"],
+    "Playera Innegable": ["batman1.png", "batman2.jpg", "batman3.jpg"]
+};
+let nombreUrl = new URLSearchParams(window.location.search).get('name') || "★ Batman semi oversize";
+let currentProduct = {
+    name: nombreUrl,
+    price: parseInt(new URLSearchParams(window.location.search).get('price')) || 550,
+    images: galerias[nombreUrl] || ["batman1.png","batman2.jpg","batman3.jpg"],
+    desc: "Streetwear que no se discute. Corte oversize con caída premium..."
+};
 
-        let currentProduct = {
-            name: nombreUrl,
-            price: parseInt(params.get('price')) || 550,
-            images: galerias[nombreUrl] || ["batman1.png", "batman2.jpg", "batman3.jpg"], 
-            desc: "Streetwear que no se discute. Corte oversize con caída premium, confeccionada en algodón 240g de alta densidad. Un básico innegable para tu colección diaria."
-        };
+let selectedSize = null;
+let pageQty = 1;
+let currentImg = 0;
 
-        let selectedSize = null;
-        let pageQty = 1;
-        let currentImg = 0;
+function initProduct() {
+    document.getElementById("pageImg").src = currentProduct.images[0];
+    document.getElementById("pageTitle").innerText = currentProduct.name;
+    document.getElementById("pagePrice").innerText = "$" + currentProduct.price.toLocaleString();
+    document.getElementById("pageDesc").innerText = currentProduct.desc;
+    setupDots();
+}
 
-        function initProduct() {
-            // Cargar imagen principal
-            const imgElement = document.getElementById("pageImg");
-            imgElement.src = currentProduct.images[0];
-            
-            document.getElementById("pageTitle").innerText = currentProduct.name;
-            document.getElementById("pagePrice").innerText = "$" + currentProduct.price.toLocaleString();
-            document.getElementById("pageDesc").innerText = currentProduct.desc;
-            
-            // ✅ Generar los 3 puntitos
-            setupDots();
-        }
+function setupDots() {
+    const dots = document.getElementById("pageDots");
+    dots.innerHTML = "";
+    currentProduct.images.forEach((_, i) => {
+        let dot = document.createElement("div");
+        dot.className = "product-dot" + (i === 0 ? " active" : "");
+        dot.onclick = () => { currentImg = i; showImg(i); };
+        dots.appendChild(dot);
+    });
+}
 
-        function setupDots() {
-            const dots = document.getElementById("pageDots");
-            dots.innerHTML = "";
-            
-            // Crear 3 dots para las 3 imágenes
-            currentProduct.images.forEach((_, i) => {
-                let dot = document.createElement("div");
-                dot.className = "product-dot" + (i === 0 ? " active" : "");
-                dot.onclick = () => { 
-                    currentImg = i; 
-                    showImg(i); 
-                };
-                dots.appendChild(dot);
-            });
-        }
+function showImg(i) {
+    const img = document.getElementById("pageImg");
+    img.style.opacity = "0";
+    setTimeout(() => {
+        img.src = currentProduct.images[i];
+        img.style.opacity = "1";
+        document.querySelectorAll(".product-dot").forEach(d => d.classList.remove("active"));
+        document.querySelectorAll(".product-dot")[i].classList.add("active");
+    }, 150);
+}
 
-        function showImg(i) {
-            const img = document.getElementById("pageImg");
-            img.style.opacity = "0";
-            setTimeout(() => {
-                img.src = currentProduct.images[i];
-                img.style.opacity = "1";
-                
-                // Actualizar dots activos
-                const dots = document.querySelectorAll(".product-dot");
-                dots.forEach(d => d.classList.remove("active"));
-                dots[i].classList.add("active");
-            }, 150);
-        }
+function prevImg() { currentImg = (currentImg - 1 + currentProduct.images.length) % currentProduct.images.length; showImg(currentImg); }
+function nextImg() { currentImg = (currentImg + 1) % currentProduct.images.length; showImg(currentImg); }
 
-        function prevImg() { 
-            currentImg = (currentImg - 1 + currentProduct.images.length) % currentProduct.images.length;
-            showImg(currentImg);
-        }
+function selectSize(btn) {
+    document.querySelectorAll(".size-options button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedSize = btn.innerText;
+}
 
-        function nextImg() {
-            currentImg = (currentImg + 1) % currentProduct.images.length;
-            showImg(currentImg);
-        }
+function increaseQty() { pageQty++; document.getElementById("pageQty").value = pageQty; }
+function decreaseQty() { if(pageQty>1){ pageQty--; document.getElementById("pageQty").value = pageQty;} }
 
-        function selectSize(btn) {
-            document.querySelectorAll(".size-options button").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            selectedSize = btn.innerText;
-        }
+function toggleCart() {
+    document.getElementById("cartPanel").classList.toggle("open");
+    document.getElementById("overlay").classList.toggle("show");
+    renderCartItems();
+}
 
-        function increaseQty() { pageQty++; document.getElementById("pageQty").value = pageQty; }
-        function decreaseQty() { if(pageQty > 1) { pageQty--; document.getElementById("pageQty").value = pageQty; } }
+function closeCart() {
+    document.getElementById("cartPanel").classList.remove("open");
+    document.getElementById("overlay").classList.remove("show");
+}
 
-        function toggleCart() {
-            document.getElementById("cartPanel").classList.toggle("open");
-            document.getElementById("overlay").classList.toggle("show");
-            renderCartItems();
-        }
+function updateCartCount() {
+    let count = cart.reduce((a,b)=>a+(b.qty||1),0);
+    const c = document.getElementById("cart-count");
+    c.style.display = count>0?"block":"none";
+    c.innerText = count;
+}
 
-        function closeCart() {
-            document.getElementById("cartPanel").classList.remove("open");
-            document.getElementById("overlay").classList.remove("show");
-        }
+function addProduct() {
+    if(!selectedSize){ alert("Por favor selecciona una talla"); return; }
+    cart.push({name:currentProduct.name, price:currentProduct.price, img:currentProduct.images[0], size:selectedSize, qty:pageQty});
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartCount();
+    showToast();
+    pageQty=1; document.getElementById("pageQty").value=1;
+}
 
-        function updateCartCount() {
-            let count = cart.reduce((a, b) => a + (b.qty || 1), 0);
-            const c = document.getElementById("cart-count");
-            c.style.display = count > 0 ? "block" : "none";
-            c.innerText = count;
-        }
+function showToast() {
+    const t = document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"),2000);
+}
 
-        function addProduct() {
-            if (!selectedSize) { alert("Por favor selecciona una talla"); return; }
-            cart.push({
-                name: currentProduct.name,
-                price: currentProduct.price,
-                img: currentProduct.images[0],
-                size: selectedSize,
-                qty: pageQty
-            });
-            localStorage.setItem("cart", JSON.stringify(cart));
-            updateCartCount();
-            showToast();
-            pageQty = 1; document.getElementById("pageQty").value = 1;
-        }
+function renderCartItems() {
+    const container = document.getElementById("cartItems");
+    container.innerHTML = cart.length===0?'<p style="color:#555;text-align:center;margin-top:50px;">Tu carrito está vacío</p>':"";
+    let total = 0;
+    cart.forEach(p=>{
+        total += p.price*p.qty;
+        container.innerHTML += `
+            <div class="cart-item">
+                <img src="${p.img}" alt="${p.name}">
+                <div style="flex:1">
+                    <div style="font-size:14px;font-weight:700;color:#fff;">${p.name}</div>
+                    <div style="font-size:12px;color:#888;">Talla: ${p.size} | Cant: ${p.qty}</div>
+                    <div style="color:#ffd000;font-weight:bold;margin-top:4px;">$${(p.price*p.qty).toLocaleString()}</div>
+                </div>
+            </div>`;
+    });
+    document.getElementById("total").innerText="$"+total.toLocaleString();
+}
 
-        function showToast() {
-            const t = document.getElementById("toast");
-            t.classList.add("show");
-            setTimeout(() => t.classList.remove("show"), 2000);
-        }
+function goHome(){ window.location.href="index.html"; }
 
-        function renderCartItems() {
-            const container = document.getElementById("cartItems");
-            container.innerHTML = cart.length === 0 ? '<p style="color:#555;text-align:center;margin-top:50px;">Tu carrito está vacío</p>' : "";
-            let total = 0;
-            cart.forEach((p, i) => {
-                total += p.price * p.qty;
-                container.innerHTML += `
-                    <div class="cart-item">
-                        <img src="${p.img}" alt="${p.name}">
-                        <div style="flex:1">
-                            <div style="font-size:14px;font-weight:700;color:#fff;">${p.name}</div>
-                            <div style="font-size:12px;color:#888;">Talla: ${p.size} | Cant: ${p.qty}</div>
-                            <div style="color:#ffd000;font-weight:bold;margin-top:4px;">$${(p.price * p.qty).toLocaleString()}</div>
-                        </div>
-                    </div>`;
-            });
-            document.getElementById("total").innerText = "$" + total.toLocaleString();
-        }
+// --- SWIPE TÁCTIL ---
+let startX = 0;
+let endX = 0;
+const productLeft = document.getElementById("productLeft");
 
-        function goHome() { window.location.href = "index.html"; }
+productLeft.addEventListener("touchstart", (e)=>{
+    startX = e.touches[0].clientX;
+});
 
-        // Inicializar
-        initProduct();
-        updateCartCount();
-    </script>
+productLeft.addEventListener("touchmove", (e)=>{
+    endX = e.touches[0].clientX;
+});
+
+productLeft.addEventListener("touchend", ()=>{
+    const delta = endX - startX;
+    if(Math.abs(delta) > 50){ // umbral para detectar swipe
+        if(delta < 0){ nextImg(); }
+        else{ prevImg(); }
+    }
+    startX = 0; endX = 0;
+});
+
+// --- INICIALIZACIÓN ---
+initProduct();
+updateCartCount();
+</script>
 </body>
 </html>
